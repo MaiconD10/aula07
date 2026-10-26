@@ -1,10 +1,15 @@
-from django.http import JsonResponse
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Transacao
+from .serializers import TransacaoSerializer
 
-
+@api_view(['GET'])
 def listar_transacoes(request):
-    transacoes = Transacao.objects.all().values(
-        'id', 'descricao', 'valor', 'data', 'tipo', 'status', 'usuario', 'categoria'
-    )
-    return JsonResponse(list(transacoes), safe=False)
+    transacoes = Transacao.objects.all()
+    serializer = TransacaoSerializer(transacoes, many=True)
+    return Response(serializer.data)
+
+def listar_transacoes_pendentes(request):
+    transacoes = Transacao.objects.filter(status='PENDENTE')
+    serializer = TransacaoSerializer(transacoes, many=True)
+    return Response(serializer.data)
